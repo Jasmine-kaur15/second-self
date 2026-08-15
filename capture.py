@@ -20,7 +20,8 @@ def main():
             print("Error: This content has already been captured (duplicate detected).")
             sys.exit(0)
             
-        capture_id = str(uuid.uuid4())
+        date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        capture_id = f"{date_str}_{uuid.uuid4()}"
         timestamp = datetime.now(timezone.utc).isoformat()
         
         metadata = {

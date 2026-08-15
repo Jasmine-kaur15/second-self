@@ -45,3 +45,37 @@ def save_raw_capture(uuid_str: str, content: str, metadata: dict):
     
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(header + content)
+
+def parse_markdown_with_frontmatter(filepath: str) -> tuple[dict, str]:
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+        
+    if content.startswith("---\n"):
+        parts = content.split("---\n", 2)
+        if len(parts) >= 3:
+            header = parts[1]
+            body = parts[2]
+            metadata = {}
+            for line in header.strip().split('\n'):
+                if ': ' in line:
+                    k, v = line.split(': ', 1)
+                    metadata[k.strip()] = v.strip()
+            return metadata, body
+    return {}, content
+
+def save_wiki_page(uuid_str: str, content: str, metadata: dict):
+    os.makedirs(WIKI_DIR, exist_ok=True)
+    filepath = os.path.join(WIKI_DIR, f"{uuid_str}.md")
+    
+    header = "---\n"
+    for k, v in metadata.items():
+        if isinstance(v, list):
+            header += f"{k}:\n"
+            for item in v:
+                header += f"  - {item}\n"
+        else:
+            header += f"{k}: {v}\n"
+    header += "---\n\n"
+    
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(header + content)
