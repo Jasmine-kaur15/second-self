@@ -3,16 +3,13 @@
 import os
 import re
 from datetime import datetime, timezone
+from lib import storage
 from lib.storage import WIKI_DIR, save_json, parse_markdown_with_frontmatter
 
 GRAPH_FILE = os.path.join("data", "graph.json")
 
 def main():
     print("Starting Graph Generation process...")
-    
-    if not os.path.exists(WIKI_DIR):
-        print("No wiki directory found. Nothing to build.")
-        return
         
     nodes = []
     edges = []
@@ -21,7 +18,8 @@ def main():
     # Though directed edges for a knowledge graph are fine
     seen_edges = set()
     
-    wiki_files = [f for f in os.listdir(WIKI_DIR) if f.endswith('.md')]
+    raw_files = storage.list_files(WIKI_DIR)
+    wiki_files = [f for f in raw_files if f.endswith('.md')]
     
     if not wiki_files:
         print("No files in wiki directory.")
@@ -56,12 +54,12 @@ def main():
             preview = content[:150].strip() + "..." if len(content) > 150 else content.strip()
             
             color_map = {
-                "Projects": "#2B7CE9",
-                "Areas": "#109618",
-                "Resources": "#FF9900",
-                "Archives": "#808080"
+                "Projects": "#4A1F28",   # Wine
+                "Areas": "#7A2E3C",      # Lighter wine
+                "Resources": "#C98A5E",  # Beige highlight
+                "Archives": "#3f3236"    # Dark muted
             }
-            node_color = color_map.get(group, "#808080")
+            node_color = color_map.get(group, "#3f3236")
             
             # Formatted tooltip title for UI
             title_html = f"<b>Group:</b> {group}<br>"

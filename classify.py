@@ -1,24 +1,26 @@
 """Phase 2: Classification. Uses Groq LLM to categorize raw captures into PARA, extract tags, and summarize. Updates index.json."""
 
 import os
+from lib import storage
 from lib.storage import load_json, save_json, RAW_DIR, parse_markdown_with_frontmatter, save_wiki_page
 from lib.llm import classify_content
 
-INDEX_FILE = os.path.join("data", "index.json")
+INDEX_FILE = os.path.join("data", "index.json").replace("\\", "/")
 
 def main():
     print("Starting classification process...")
     index = load_json(INDEX_FILE, default_val={})
     
-    if not os.path.exists(RAW_DIR):
-        print("No raw directory found. Nothing to classify.")
+    raw_files = storage.list_files(RAW_DIR)
+    if not raw_files:
+        print("No raw directory/files found. Nothing to classify.")
         return
         
-    for filename in os.listdir(RAW_DIR):
+    for filename in raw_files:
         if not filename.endswith('.md'):
             continue
             
-        filepath = os.path.join(RAW_DIR, filename)
+        filepath = os.path.join(RAW_DIR, filename).replace("\\", "/")
         uuid_str = filename[:-3] # remove .md
         
         if uuid_str in index:

@@ -4,6 +4,7 @@ import os
 import pickle
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
+from lib import storage
 
 # Use a small, fast model suitable for semantic search and clustering
 MODEL_NAME = 'all-MiniLM-L6-v2'
@@ -16,18 +17,17 @@ def get_model():
     return _model
 
 def load_embeddings_cache(filepath: str) -> dict:
-    if os.path.exists(filepath):
-        try:
-            with open(filepath, 'rb') as f:
-                return pickle.load(f)
-        except Exception as e:
-            print(f"Error loading embeddings cache from {filepath}: {e}")
+    try:
+        if storage.file_exists(filepath):
+            data = storage.read_bytes(filepath)
+            return pickle.loads(data)
+    except Exception as e:
+        print(f"Error loading embeddings cache from {filepath}: {e}")
     return {}
 
 def save_embeddings_cache(filepath: str, cache: dict):
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, 'wb') as f:
-        pickle.dump(cache, f)
+    data = pickle.dumps(cache)
+    storage.write_bytes(filepath, data)
 
 def compute_embeddings(texts: list[str]) -> np.ndarray:
     model = get_model()

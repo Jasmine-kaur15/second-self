@@ -2,6 +2,7 @@
 
 import os
 import numpy as np
+from lib import storage
 from lib.storage import parse_markdown_with_frontmatter, WIKI_DIR
 from lib.embeddings import load_embeddings_cache, save_embeddings_cache, compute_embeddings, compute_similarity
 
@@ -12,15 +13,12 @@ MAX_FALLBACK_LINKS = 3
 
 def main():
     print("Starting Auto-Linking process...")
-    
-    if not os.path.exists(WIKI_DIR):
-        print("No wiki directory found. Nothing to link.")
-        return
         
     cache = load_embeddings_cache(EMBEDDINGS_FILE)
     
     # 1. Discover all wiki files
-    wiki_files = [f for f in os.listdir(WIKI_DIR) if f.endswith('.md')]
+    raw_files = storage.list_files(WIKI_DIR)
+    wiki_files = [f for f in raw_files if f.endswith('.md')]
     
     if not wiki_files:
         print("No files in wiki directory.")
@@ -149,12 +147,11 @@ def main():
             continue
             
         filepath = os.path.join(WIKI_DIR, f"{uuid_str}.md")
-        if not os.path.exists(filepath):
+        if not storage.file_exists(filepath):
             continue
             
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                full_content = f.read()
+            full_content = storage.read_text(filepath)
                 
             added_any = False
             
@@ -185,8 +182,7 @@ def main():
                         full_content += '\n'
                     full_content += '\n'.join(new_lines) + '\n'
                     
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    f.write(full_content)
+                storage.write_text(filepath, full_content)
                 files_updated += 1
                 print(f"  - Updated {uuid_str}.md")
                 

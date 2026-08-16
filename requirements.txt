@@ -1,3 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 streamlit
 streamlit-agraph
 sentence-transformers
@@ -6,3 +8,4 @@ python-dotenv
 PyPDF2
 beautifulsoup4
 requests
+supabase
