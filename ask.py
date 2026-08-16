@@ -11,7 +11,11 @@ from lib.embeddings import (
     compute_embeddings,
     compute_similarity
 )
-from lib.storage import WIKI_DIR, parse_markdown_with_frontmatter
+from lib.storage import (
+    WIKI_DIR,
+    parse_markdown_with_frontmatter,
+    file_exists
+)
 from lib.llm import get_groq_client
 
 
@@ -104,7 +108,8 @@ def ask(query: str) -> str:
             f"{uuid_str}.md"
         )
 
-        if not os.path.exists(filepath):
+        if not file_exists(filepath):
+            print(f"Wiki file not found in Supabase: {filepath}")
             continue
 
         try:
