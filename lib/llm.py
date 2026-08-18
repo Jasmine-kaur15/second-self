@@ -70,7 +70,7 @@ def classify_content(content: str) -> dict:
     for attempt in range(2):
         try:
             response = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="openai/gpt-oss-20b",
                 messages=[
                     {"role": "system", "content": "You are a JSON assistant. Always output valid JSON."},
                     {"role": "user", "content": prompt}
